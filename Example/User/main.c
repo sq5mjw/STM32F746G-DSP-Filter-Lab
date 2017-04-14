@@ -50,6 +50,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+/* ftype: 0 = no filter, 1 = DSP BandPass, 2 = DSP BandPass IIR */
+int ftype = 2;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
@@ -109,10 +111,10 @@ int main(void)
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FRAME_BUFFER);
   Display_DemoDescription();
 
-  /* DO DSP if true, line-in to line-out when set to false*/
+  /* ftype: 0 = no filter, 1 = DSP BandPass FIR, 2 = DSP BandPass IIR */
   while (1)
   {
-	filter(true);
+	filter(ftype);
   }
 }
 

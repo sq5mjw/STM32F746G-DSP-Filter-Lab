@@ -1,7 +1,3 @@
-/Drivers/
 /Example/
-/Utilities/
-/makefile
-/objects.list
-/objects.mk
 /sources.mk
+/Drivers/

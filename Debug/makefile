@@ -13,7 +13,16 @@ RM := rm -rf
 -include Example/User/subdir.mk
 -include Example/SW4STM32/subdir.mk
 -include Drivers/STM32F7xx_HAL_Driver/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/TransformFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/SupportFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/StatisticsFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/MatrixFunctions/subdir.mk
 -include Drivers/CMSIS/DSP_Lib/FilteringFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/FastMathFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/ControllerFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/ComplexMathFunctions/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/CommonTables/subdir.mk
+-include Drivers/CMSIS/DSP_Lib/BasicMathFunctions/subdir.mk
 -include Drivers/CMSIS/subdir.mk
 -include Drivers/BSP/STM32746G_DISCOVERY/subdir.mk
 -include Drivers/BSP/Components/subdir.mk

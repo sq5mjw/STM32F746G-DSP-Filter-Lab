@@ -62,11 +62,87 @@ typedef enum
 }BUFFER_StateTypeDef;
 
 #define AUDIO_BLOCK_SIZE   ((uint32_t)512)
+
 #define SIGNAL_SAMPLES		AUDIO_BLOCK_SIZE/2
 #define AUDIO_BUFFER_IN    AUDIO_REC_START_ADDR     /* In SDRAM */
 #define AUDIO_BUFFER_OUT   (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 2)) /* In SDRAM */
-#define NUM_TAPS			((uint16_t)352)
+#define NUM_TAPS_FIR			((uint16_t)232)
+
+#define numStages_IIR 4
+
+#define NUM_TAPS_IIR 5*numStages_IIR
+
 #define BUFSIZE 9
+
+float32_t float_buffer_in [AUDIO_BLOCK_SIZE];
+float32_t float_buffer_out [AUDIO_BLOCK_SIZE];
+float32_t float_buffer_in2 [AUDIO_BLOCK_SIZE];
+float32_t float_buffer_out2 [AUDIO_BLOCK_SIZE];
+
+float32_t pState1[2*numStages_IIR];
+
+// IIR filter design tools sets a0 to 1 and CMSIS library just skips it, because it is always 1
+// Also depends on the IIR tool used, but a1 and a2 must be set to negative according to the CMSIS library (not multiplied by -1 (reversed), just negative value)
+// Anyway check carefully outputs from your design tool also the order of coefficients, values are as follow: {b0,b1,b2,a1,a2}
+// This is:
+// Papoulis filter:
+// Sampling 16000
+// Fc 0,043800 350HZ
+// bw 0,00650 52Hz
+// poles 8
+
+float pCoeffs[NUM_TAPS_IIR] = {
+		-0.004455006202277991,
+		0.000000000000000000,
+		0.004455006202277991,
+		-1.973421667376293210,
+		-0.991806450232148196,
+
+		-0.004454129060822948,
+		0.000000000000000000,
+		0.004454129060822948,
+		-1.972333384811759240,
+		-0.991611174510100390,
+
+		-0.005860927854241210,
+		0.000000000000000000,
+		0.005860927854241210,
+		-1.975751625823927830,
+		-0.993336929651949085,
+
+		-0.005858143958630319,
+		0.000000000000000000,
+		0.005858143958630319,
+		-1.972683105111642020,
+		-0.992865102257487586,
+
+		-0.007528400708795384,
+		0.000000000000000000,
+		0.007528400708795384,
+		-1.978715176731522530,
+		-0.995708900182985746,
+
+		-0.007524857577904183,
+		0.000000000000000000,
+		0.007524857577904183,
+		-1.974306556125594580,
+		-0.995240284457103885,
+
+		-0.008583697311143805,
+		0.000000000000000000,
+		0.008583697311143805,
+		-1.981830509013871920,
+		-0.998516500043749367,
+
+		-0.008582023001338366,
+		0.000000000000000000,
+		0.008582023001338366,
+		-1.976939424056710190,
+		-0.998321732462098321
+
+};
+
+arm_biquad_cascade_df2T_instance_f32 S;
 
 unsigned char logmsgbuff[128];
 char buf[BUFSIZE];
@@ -85,397 +161,249 @@ static void AudioLoopback_SetHint(void);
   * @retval None
   */
 
-arm_fir_instance_q15 FIRstructINT, FIRstructINT2, FIRstructINT3;
+arm_fir_instance_q15 FIRstructINT, FIRstructINT2, FIRstructINT3, FIRstructINT4,FIRstructINT5 ;
 
-q15_t pFIRStateINT[NUM_TAPS + AUDIO_BLOCK_SIZE];
-q15_t pFIRStateINT2[NUM_TAPS + AUDIO_BLOCK_SIZE];
-q15_t pFIRStateINT3[NUM_TAPS + AUDIO_BLOCK_SIZE];
-
-/*
-
-FIR filter designed with
-http://t-filter.appspot.com
-
-sampling frequency: 16000 Hz
-
-fixed point precision: 16 bits
-
-* 0 Hz - 550 Hz
-  gain = 0
-  desired attenuation = -80 dB
-  actual attenuation = n/a
-
-* 675 Hz - 725 Hz
-  gain = 1
-  desired ripple = 5 dB
-  actual ripple = n/a
-
-* 850 Hz - 8000 Hz
-  gain = 0
-  desired attenuation = -80 dB
-  actual attenuation = n/a
-
-*/
+q15_t pFIRStateINT[NUM_TAPS_FIR + AUDIO_BLOCK_SIZE -1];
+q15_t pFIRStateINT2[NUM_TAPS_FIR + AUDIO_BLOCK_SIZE -1];
+q15_t pFIRStateINT3[NUM_TAPS_FIR + AUDIO_BLOCK_SIZE -1];
+q15_t pFIRStateINT4[NUM_TAPS_FIR + AUDIO_BLOCK_SIZE -1];
+q15_t pFIRStateINT5[NUM_TAPS_FIR + AUDIO_BLOCK_SIZE -1];
 
 
-static int firCoeffINT_BP[NUM_TAPS] = {
-		  1,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -1,
-		  -1,
-		  0,
-		  2,
-		  3,
-		  4,
-		  6,
-		  7,
-		  7,
-		  7,
-		  7,
-		  5,
-		  3,
-		  1,
-		  -3,
-		  -6,
-		  -10,
-		  -13,
-		  -16,
-		  -17,
-		  -18,
-		  -17,
-		  -14,
-		  -10,
-		  -4,
-		  3,
-		  10,
-		  18,
-		  25,
-		  31,
-		  35,
-		  36,
-		  35,
-		  31,
-		  23,
-		  13,
-		  1,
-		  -13,
-		  -28,
-		  -41,
-		  -53,
-		  -62,
-		  -66,
-		  -66,
-		  -60,
-		  -48,
-		  -32,
-		  -11,
-		  12,
-		  37,
-		  61,
-		  82,
-		  99,
-		  109,
-		  111,
-		  104,
-		  88,
-		  64,
-		  33,
-		  -3,
-		  -42,
-		  -81,
-		  -116,
-		  -145,
-		  -164,
-		  -172,
-		  -166,
-		  -147,
-		  -115,
-		  -72,
-		  -20,
-		  38,
-		  96,
-		  150,
-		  196,
-		  230,
-		  248,
-		  247,
-		  226,
-		  187,
-		  131,
-		  61,
-		  -18,
-		  -100,
-		  -178,
-		  -247,
-		  -301,
-		  -334,
-		  -342,
-		  -324,
-		  -280,
-		  -212,
-		  -124,
-		  -22,
-		  86,
-		  193,
-		  290,
-		  369,
-		  423,
-		  446,
-		  436,
-		  392,
-		  315,
-		  211,
-		  86,
-		  -50,
-		  -188,
-		  -316,
-		  -425,
-		  -506,
-		  -550,
-		  -553,
-		  -514,
-		  -434,
-		  -318,
-		  -174,
-		  -11,
-		  157,
-		  318,
-		  460,
-		  571,
-		  641,
-		  664,
-		  637,
-		  560,
-		  438,
-		  280,
-		  97,
-		  -99,
-		  -292,
-		  -466,
-		  -609,
-		  -709,
-		  -757,
-		  -748,
-		  -681,
-		  -562,
-		  -398,
-		  -200,
-		  16,
-		  235,
-		  439,
-		  614,
-		  744,
-		  819,
-		  834,
-		  785,
-		  676,
-		  515,
-		  312,
-		  84,
-		  -153,
-		  -380,
-		  -581,
-		  -740,
-		  -844,
-		  -885,
-		  -859,
-		  -768,
-		  -618,
-		  -422,
-		  -192,
-		  53,
-		  295,
-		  515,
-		  697,
-		  826,
-		  893,
-		  893,
-		  826,
-		  697,
-		  515,
-		  295,
-		  53,
-		  -192,
-		  -422,
-		  -618,
-		  -768,
-		  -859,
-		  -885,
-		  -844,
-		  -740,
-		  -581,
-		  -380,
-		  -153,
-		  84,
-		  312,
-		  515,
-		  676,
-		  785,
-		  834,
-		  819,
-		  744,
-		  614,
-		  439,
-		  235,
-		  16,
-		  -200,
-		  -398,
-		  -562,
-		  -681,
-		  -748,
-		  -757,
-		  -709,
-		  -609,
-		  -466,
-		  -292,
-		  -99,
-		  97,
-		  280,
-		  438,
-		  560,
-		  637,
-		  664,
-		  641,
-		  571,
-		  460,
-		  318,
-		  157,
-		  -11,
-		  -174,
-		  -318,
-		  -434,
-		  -514,
-		  -553,
-		  -550,
-		  -506,
-		  -425,
-		  -316,
-		  -188,
-		  -50,
-		  86,
-		  211,
-		  315,
-		  392,
-		  436,
-		  446,
-		  423,
-		  369,
-		  290,
-		  193,
-		  86,
-		  -22,
-		  -124,
-		  -212,
-		  -280,
-		  -324,
-		  -342,
-		  -334,
-		  -301,
-		  -247,
-		  -178,
-		  -100,
-		  -18,
-		  61,
-		  131,
-		  187,
-		  226,
-		  247,
-		  248,
-		  230,
-		  196,
-		  150,
-		  96,
-		  38,
-		  -20,
-		  -72,
-		  -115,
-		  -147,
-		  -166,
-		  -172,
-		  -164,
-		  -145,
-		  -116,
-		  -81,
-		  -42,
-		  -3,
-		  33,
-		  64,
-		  88,
-		  104,
-		  111,
-		  109,
-		  99,
-		  82,
-		  61,
-		  37,
-		  12,
-		  -11,
-		  -32,
-		  -48,
-		  -60,
-		  -66,
-		  -66,
-		  -62,
-		  -53,
-		  -41,
-		  -28,
-		  -13,
-		  1,
-		  13,
-		  23,
-		  31,
-		  35,
-		  36,
-		  35,
-		  31,
-		  25,
-		  18,
-		  10,
-		  3,
-		  -4,
-		  -10,
-		  -14,
-		  -17,
-		  -18,
-		  -17,
-		  -16,
-		  -13,
-		  -10,
-		  -6,
-		  -3,
-		  1,
-		  3,
-		  5,
-		  7,
-		  7,
-		  7,
-		  7,
-		  6,
-		  4,
-		  3,
-		  2,
-		  0,
-		  -1,
-		  -1,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  -2,
-		  1,
-		  0
-};
-
-
-
+static int firCoeffINT_BP[NUM_TAPS_FIR] = {
+		22,
+		26,
+		28,
+		28,
+		26,
+		20,
+		10,
+		-1,
+		-15,
+		-30,
+		-45,
+		-59,
+		-69,
+		-75,
+		-75,
+		-69,
+		-55,
+		-35,
+		-10,
+		19,
+		51,
+		83,
+		111,
+		133,
+		147,
+		150,
+		140,
+		118,
+		84,
+		40,
+		-11,
+		-68,
+		-123,
+		-174,
+		-215,
+		-242,
+		-252,
+		-243,
+		-213,
+		-163,
+		-97,
+		-17,
+		69,
+		156,
+		238,
+		306,
+		354,
+		378,
+		373,
+		339,
+		275,
+		186,
+		76,
+		-44,
+		-170,
+		-289,
+		-392,
+		-470,
+		-515,
+		-522,
+		-489,
+		-416,
+		-306,
+		-168,
+		-11,
+		154,
+		315,
+		458,
+		572,
+		646,
+		673,
+		649,
+		574,
+		451,
+		290,
+		100,
+		-103,
+		-306,
+		-491,
+		-645,
+		-754,
+		-807,
+		-801,
+		-733,
+		-606,
+		-430,
+		-217,
+		17,
+		256,
+		481,
+		674,
+		820,
+		906,
+		924,
+		872,
+		753,
+		574,
+		349,
+		94,
+		-171,
+		-427,
+		-654,
+		-834,
+		-952,
+		-1000,
+		-971,
+		-869,
+		-701,
+		-478,
+		-218,
+		60,
+		335,
+		585,
+		792,
+		940,
+		1016,
+		1016,
+		940,
+		792,
+		585,
+		335,
+		60,
+		-218,
+		-478,
+		-701,
+		-869,
+		-971,
+		-1000,
+		-952,
+		-834,
+		-654,
+		-427,
+		-171,
+		94,
+		349,
+		574,
+		753,
+		872,
+		924,
+		906,
+		820,
+		674,
+		481,
+		256,
+		17,
+		-217,
+		-430,
+		-606,
+		-733,
+		-801,
+		-807,
+		-754,
+		-645,
+		-491,
+		-306,
+		-103,
+		100,
+		290,
+		451,
+		574,
+		649,
+		673,
+		646,
+		572,
+		458,
+		315,
+		154,
+		-11,
+		-168,
+		-306,
+		-416,
+		-489,
+		-522,
+		-515,
+		-470,
+		-392,
+		-289,
+		-170,
+		-44,
+		76,
+		186,
+		275,
+		339,
+		373,
+		378,
+		354,
+		306,
+		238,
+		156,
+		69,
+		-17,
+		-97,
+		-163,
+		-213,
+		-243,
+		-252,
+		-242,
+		-215,
+		-174,
+		-123,
+		-68,
+		-11,
+		40,
+		84,
+		118,
+		140,
+		150,
+		147,
+		133,
+		111,
+		83,
+		51,
+		19,
+		-10,
+		-35,
+		-55,
+		-69,
+		-75,
+		-75,
+		-69,
+		-59,
+		-45,
+		-30,
+		-15,
+		-1,
+		10,
+		20,
+		26,
+		28,
+		28,
+		26,
+		22,
+	};
 
 
 const char * logmsg(text,value, base)
@@ -488,11 +416,8 @@ const char * logmsg(text,value, base)
     return logmsgbuff;
 }
 
-void filter (int dofilter)
+void filter (int ftype)
 {
-  arm_fir_init_q15(&FIRstructINT, NUM_TAPS, firCoeffINT_BP, pFIRStateINT, SIGNAL_SAMPLES);
-  arm_fir_init_q15(&FIRstructINT2, NUM_TAPS, firCoeffINT_BP, pFIRStateINT2, SIGNAL_SAMPLES);
-  arm_fir_init_q15(&FIRstructINT3, NUM_TAPS, firCoeffINT_BP, pFIRStateINT3, SIGNAL_SAMPLES);
 
   AudioLoopback_SetHint();
 
@@ -509,18 +434,34 @@ void filter (int dofilter)
   }
 
   /* Display the state on the screen */
-  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 225, (uint8_t *)"LINE-IN --> headphones", LEFT_MODE);
-  if (dofilter==true){
-	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"Filtering ON", LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(100, BSP_LCD_GetYSize() - 215, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS,10), LEFT_MODE);
-  }
-  else
+  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 225, (uint8_t *)"Line-In --> headphones", LEFT_MODE);
+
+  if (ftype==0)
   {
 	  BSP_LCD_SetTextColor(LCD_COLOR_RED);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"Filtering OFF", LEFT_MODE);
   }
+  else if (ftype==1)
+  {
+	  arm_fir_init_q15(&FIRstructINT, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT, SIGNAL_SAMPLES);
+	  arm_fir_init_q15(&FIRstructINT2, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT2, SIGNAL_SAMPLES);
+	  arm_fir_init_q15(&FIRstructINT3, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT3, SIGNAL_SAMPLES);
+	  arm_fir_init_q15(&FIRstructINT4, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT4, SIGNAL_SAMPLES);
+	  arm_fir_init_q15(&FIRstructINT5, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT5, SIGNAL_SAMPLES);
 
+
+	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"FIR filtering is ON, BandPass x5", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_FIR,10), LEFT_MODE);
+  }
+  else if (ftype==2)
+  {
+	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs, pState1);
+
+	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Papoulis ", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
+  }
 
   /* Initialize SDRAM buffers */
   memset((uint16_t*)AUDIO_BUFFER_IN, 0, AUDIO_BLOCK_SIZE*2);
@@ -532,7 +473,7 @@ void filter (int dofilter)
   BSP_AUDIO_IN_Record((uint16_t*)AUDIO_BUFFER_IN, AUDIO_BLOCK_SIZE);
 
   /* Start Playback */
-  // Data in bytes, lefta ndd right elements
+  // Data in bytes, left and right elements
   BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
   BSP_AUDIO_OUT_Play((uint16_t*)AUDIO_BUFFER_OUT, AUDIO_BLOCK_SIZE * 2);
 
@@ -546,14 +487,22 @@ void filter (int dofilter)
     audio_rec_buffer_state = BUFFER_OFFSET_NONE;
 
     /* Copy recorded 1st half block */
-    if (dofilter==true){
-    arm_fir_fast_q15(&FIRstructINT, (q15_t *)AUDIO_BUFFER_IN, (q15_t *)AUDIO_BUFFER_OUT, SIGNAL_SAMPLES);
-    arm_fir_fast_q15(&FIRstructINT2, (q15_t *)AUDIO_BUFFER_OUT, (q15_t *)AUDIO_BUFFER_IN, SIGNAL_SAMPLES);
-    arm_fir_fast_q15(&FIRstructINT3, (q15_t *)AUDIO_BUFFER_IN, (q15_t *)AUDIO_BUFFER_OUT, SIGNAL_SAMPLES);
+    if (ftype==0){
+    	// No DSP
+    	memcpy((uint16_t *)(AUDIO_BUFFER_OUT),(uint16_t *)(AUDIO_BUFFER_IN),AUDIO_BLOCK_SIZE);
     }
-    else {
-    memcpy((uint16_t *)(AUDIO_BUFFER_OUT),(uint16_t *)(AUDIO_BUFFER_IN),AUDIO_BLOCK_SIZE);
-    }
+    else if (ftype==1){
+    	// DSP FIR
+        arm_fir_fast_q15(&FIRstructINT, (q15_t *)AUDIO_BUFFER_IN, (q15_t *)AUDIO_BUFFER_OUT, SIGNAL_SAMPLES);
+        arm_fir_fast_q15(&FIRstructINT2, (q15_t *)AUDIO_BUFFER_OUT, (q15_t *)AUDIO_BUFFER_IN, SIGNAL_SAMPLES);
+        arm_fir_fast_q15(&FIRstructINT3, (q15_t *)AUDIO_BUFFER_IN, (q15_t *)AUDIO_BUFFER_OUT, SIGNAL_SAMPLES);
+        }
+    else if (ftype==2){
+    	// DSP IIR
+    	arm_q15_to_float (AUDIO_BUFFER_IN, float_buffer_in, SIGNAL_SAMPLES);
+    	arm_biquad_cascade_df2T_f32(&S, float_buffer_in, float_buffer_out, SIGNAL_SAMPLES);
+    	arm_float_to_q15 (float_buffer_out, AUDIO_BUFFER_OUT, SIGNAL_SAMPLES);
+    	}
 
     /* Wait end of one block recording */
     while(audio_rec_buffer_state != BUFFER_OFFSET_FULL)
@@ -563,15 +512,23 @@ void filter (int dofilter)
     audio_rec_buffer_state = BUFFER_OFFSET_NONE;
 
     /* Copy recorded 2nd half block */
-    if (dofilter==true){
-    arm_fir_fast_q15(&FIRstructINT, (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
-    arm_fir_fast_q15(&FIRstructINT2, (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
-    arm_fir_fast_q15(&FIRstructINT3, (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
+    if (ftype==0){
+    	memcpy((uint16_t *)((AUDIO_BUFFER_OUT) + (AUDIO_BLOCK_SIZE)),(uint16_t *)((AUDIO_BUFFER_IN) + (AUDIO_BLOCK_SIZE)),AUDIO_BLOCK_SIZE);
     }
-    else
-    {
-     memcpy((uint16_t *)((AUDIO_BUFFER_OUT) + (AUDIO_BLOCK_SIZE)),(uint16_t *)((AUDIO_BUFFER_IN) + (AUDIO_BLOCK_SIZE)),AUDIO_BLOCK_SIZE);
+    else if (ftype==1){
+    	//DSP FIR
+        arm_fir_fast_q15(&FIRstructINT, (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
+        arm_fir_fast_q15(&FIRstructINT2, (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
+        arm_fir_fast_q15(&FIRstructINT3, (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
     }
+    else if (ftype==2){
+    	// DSP IIR
+    	arm_q15_to_float((AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), float_buffer_in2, SIGNAL_SAMPLES);
+    	arm_biquad_cascade_df2T_f32(&S, float_buffer_in2, float_buffer_out2, SIGNAL_SAMPLES);
+    	arm_float_to_q15(float_buffer_out2, AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE), SIGNAL_SAMPLES);
+    }
+
+
 
     if (CheckForUserInput() > 0)
     {
@@ -595,7 +552,7 @@ static void AudioLoopback_SetHint(void)
   BSP_LCD_SetTextColor(LCD_COLOR_RED);
   BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
   BSP_LCD_SetFont(&Font24);
-  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW DSP Filter Lab v0.3", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW DSP Filter Lab v0.5", LEFT_MODE);
   BSP_LCD_SetFont(&Font12);
 
   /* Set the LCD Text Color */
