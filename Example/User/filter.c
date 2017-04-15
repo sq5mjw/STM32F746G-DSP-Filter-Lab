@@ -658,7 +658,7 @@ static void AudioLoopback_SetHint(void)
   BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW DSP Filter Lab v0.6", LEFT_MODE);
   BSP_LCD_SetFont(&Font12);
   BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-  BSP_LCD_DisplayStringAt(0, 20, (uint8_t *)"Press user button to next filter", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, 20, (uint8_t *)"Press the user button to switch to the next filter", LEFT_MODE);
 }
 
 static void MyInfo(void)
