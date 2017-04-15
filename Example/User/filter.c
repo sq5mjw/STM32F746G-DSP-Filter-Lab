@@ -505,22 +505,25 @@ void filter (int ftype)
   /* Initialize Audio RecINPUT_DEVICE_INPUT_LINE order INPUT_DEVICE_INPUT_LINE_1 */
   if (BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, DEFAULT_AUDIO_IN_FREQ, DEFAULT_AUDIO_IN_BIT_RESOLUTION, DEFAULT_AUDIO_IN_CHANNEL_NBR) == AUDIO_OK)
   {
-   BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 245,  (uint8_t *)logmsg("Audio buffer size ",AUDIO_BLOCK_SIZE,10), LEFT_MODE);
-   BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 235, (uint8_t *)"Audio record Init OK", LEFT_MODE);
+   BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+   BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 235,  (uint8_t *)logmsg("Audio buffer size ",AUDIO_BLOCK_SIZE,10), LEFT_MODE);
+   BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 225, (uint8_t *)"Audio record Init OK", LEFT_MODE);
   }
   else
   {
+	BSP_LCD_SetTextColor(LCD_COLOR_RED);
     BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 95, (uint8_t *)" AUDIO RECORD INIT FAILED", CENTER_MODE);
     BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 65, (uint8_t *)" Please reset the board ", CENTER_MODE);
   }
 
   /* Display the state on the screen */
-  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 225, (uint8_t *)"Line-In --> Line-Out", LEFT_MODE);
+  BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"Line-In --> Line-Out", LEFT_MODE);
 
   if (ftype==0)
   {
 	  BSP_LCD_SetTextColor(LCD_COLOR_RED);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"Filtering OFF", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"Filtering OFF", LEFT_MODE);
   }
   else if (ftype==1)
   {
@@ -532,16 +535,16 @@ void filter (int ftype)
 
 
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"FIR filtering is ON, BandPass x5", LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_FIR,10), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"FIR filtering is ON, BandPass x5", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_FIR,10), LEFT_MODE);
   }
   else if (ftype==2)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Papoulis, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Papoulis", LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Papoulis", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
 
   }
 
@@ -549,18 +552,18 @@ void filter (int ftype)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Bessel, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Bessel", LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Bessel", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
   }
 
   else if (ftype==4)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Chebyshev, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Chebyshev +10db", LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Chebyshev +10db", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
   }
 
 
@@ -646,17 +649,16 @@ static void AudioLoopback_SetHint(void)
 {
   /* Clear the LCD */
   BSP_LCD_Clear(LCD_COLOR_BLACK);
-
+  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
   /* Set Audio Demo description */
   BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
   BSP_LCD_SetTextColor(LCD_COLOR_RED);
   BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
   BSP_LCD_SetFont(&Font24);
-  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW DSP Filter Lab v0.5", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW DSP Filter Lab v0.6", LEFT_MODE);
   BSP_LCD_SetFont(&Font12);
-
-  /* Set the LCD Text Color */
-  BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+  BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+  BSP_LCD_DisplayStringAt(0, 20, (uint8_t *)"Press user button to next filter", LEFT_MODE);
 }
 
 static void MyInfo(void)

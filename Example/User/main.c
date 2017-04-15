@@ -51,7 +51,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, 4 = DSP IIR Chebyshev,*/
-int ftype = 4;
+int findex = 0;
+int fnumber = 5;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
@@ -113,7 +114,16 @@ int main(void)
 
   while (1)
   {
-	filter(ftype);
+      HAL_Delay(10);
+      filter(findex % fnumber);
+	    if (BSP_PB_GetState(BUTTON_KEY) != RESET)
+	    {
+	      HAL_Delay(10);
+	      while (BSP_PB_GetState(BUTTON_KEY) != RESET);
+	      findex++;
+	    }
+	      Display_DemoDescription();
+
   }
 }
 
