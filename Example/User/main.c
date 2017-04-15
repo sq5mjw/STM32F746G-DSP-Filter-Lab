@@ -50,8 +50,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, */
-int ftype = 2;
+/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, 4 = DSP IIR Chebyshev,*/
+int ftype = 4;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
@@ -201,7 +201,7 @@ uint8_t CheckForUserInput(void)
 {
   if (BSP_PB_GetState(BUTTON_KEY) != RESET)
   {
-    return 1 ;
+    return 1;
   }
   return 0;
 }
