@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @modified by SQ5MJW 01-April-2017
+  * @modified by SQ5MJW 15-April-2017
   * @file    BSP/Src/filter.c
   * @original author  MCD Application Team
-  * @version 0.3
+  * @version 0.5
   * @date    30-December-2016 
   * @brief   This example code shows how to use the audio feature in the
   *          stm32746g_discovery driver
@@ -79,7 +79,7 @@ float32_t float_buffer_out [AUDIO_BLOCK_SIZE];
 float32_t float_buffer_in2 [AUDIO_BLOCK_SIZE];
 float32_t float_buffer_out2 [AUDIO_BLOCK_SIZE];
 
-float32_t pState1[2*numStages_IIR];
+float32_t pStateIIR[2*numStages_IIR];
 
 // IIR filter design tools sets a0 to 1 and CMSIS library just skips it, because it is always 1
 // Also depends on the IIR tool used, but a1 and a2 must be set to negative according to the CMSIS library (not multiplied by -1 (reversed), just negative value)
@@ -87,60 +87,96 @@ float32_t pState1[2*numStages_IIR];
 // This is:
 // Papoulis filter:
 // Sampling 16000
-// Fc 0,043800 350HZ
+// Fc 0,043500 348HZ
 // bw 0,00650 52Hz
 // poles 8
 
-float pCoeffs[NUM_TAPS_IIR] = {
-		-0.004455006202277991,
+float pCoeffs_Papoulis[NUM_TAPS_IIR] = {
+		-0.004453105074640686,
 		0.000000000000000000,
-		0.004455006202277991,
-		-1.973421667376293210,
-		-0.991806450232148196,
-
-		-0.004454129060822948,
+		0.004453105074640686,
+		-1.973679161804757110,
+		-0.991810591848408807,
+		-0.004452222937777849,
 		0.000000000000000000,
-		0.004454129060822948,
-		-1.972333384811759240,
-		-0.991611174510100390,
-
-		-0.005860927854241210,
+		0.004452222937777849,
+		-1.972596132974067550,
+		-0.991614119349027545,
+		-0.005858430043101291,
 		0.000000000000000000,
-		0.005860927854241210,
-		-1.975751625823927830,
-		-0.993336929651949085,
-
-		-0.005858143958630319,
+		0.005858430043101291,
+		-1.976003438507583530,
+		-0.993341323812330090,
+		-0.005855630317908647,
 		0.000000000000000000,
-		0.005858143958630319,
-		-1.972683105111642020,
-		-0.992865102257487586,
-
-		-0.007528400708795384,
+		0.005855630317908647,
+		-1.972950775650190950,
+		-0.992866609134726907,
+		-0.007525188393173548,
 		0.000000000000000000,
-		0.007528400708795384,
-		-1.978715176731522530,
-		-0.995708900182985746,
-
-		-0.007524857577904183,
+		0.007525188393173548,
+		-1.978961485700691860,
+		-0.995712268573466841,
+		-0.007521625161054671,
 		0.000000000000000000,
-		0.007524857577904183,
-		-1.974306556125594580,
-		-0.995240284457103885,
-
-		-0.008583697311143805,
+		0.007521625161054671,
+		-1.974578419062708920,
+		-0.995240791481975196,
+		-0.008580022140128688,
 		0.000000000000000000,
-		0.008583697311143805,
-		-1.981830509013871920,
-		-0.998516500043749367,
-
-		-0.008582023001338366,
+		0.008580022140128688,
+		-1.982072427651418560,
+		-0.998517771500437079,
+		-0.008578338347309741,
 		0.000000000000000000,
-		0.008582023001338366,
-		-1.976939424056710190,
-		-0.998321732462098321
-
+		0.008578338347309741,
+		-1.977214002573235210,
+		-0.998321816638574888
 };
+
+float pCoeffs_Bessel[NUM_TAPS_IIR] = {
+		-0.015280280809286444,
+		0.000000000000000000,
+		0.015280280809286444,
+		-1.952596570282258750,
+		-0.970335110029151737,
+		-0.015263982435826997,
+		0.000000000000000000,
+		0.015263982435826997,
+		-1.950286006214408290,
+		-0.969300123552040760,
+		-0.015772145288135569,
+		0.000000000000000000,
+		0.015772145288135569,
+		-1.956755262835553570,
+		-0.973313059200168862,
+		-0.015725043462833190,
+		0.000000000000000000,
+		0.015725043462833190,
+		-1.949995039788087190,
+		-0.970406363830487173,
+		-0.016862366051165541,
+		0.000000000000000000,
+		0.016862366051165541,
+		-1.962944210991035780,
+		-0.978391155179873961,
+		-0.016791405969291406,
+		0.000000000000000000,
+		0.016791405969291406,
+		-1.952297454708791680,
+		-0.974273896886119095,
+		-0.018970071167194957,
+		0.000000000000000000,
+		0.018970071167194957,
+		-1.972126322384573750,
+		-0.986486282989031182,
+		-0.018895879446399106,
+		0.000000000000000000,
+		0.018895879446399106,
+		-1.958794754280556160,
+		-0.982628146968802407
+};
+
 
 arm_biquad_cascade_df2T_instance_f32 S;
 
@@ -434,7 +470,7 @@ void filter (int ftype)
   }
 
   /* Display the state on the screen */
-  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 225, (uint8_t *)"Line-In --> headphones", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 225, (uint8_t *)"Line-In --> Line-Out", LEFT_MODE);
 
   if (ftype==0)
   {
@@ -456,11 +492,21 @@ void filter (int ftype)
   }
   else if (ftype==2)
   {
-	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs, pState1);
-
+	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Papoulis, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Papoulis ", LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Papoulis", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
+
+  }
+
+  else if (ftype==3)
+  {
+	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Bessel, pStateIIR);
+	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 215, (uint8_t *)"IIR filtering is ON, type: Bessel", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)logmsg("Order ",2*numStages_IIR,20), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,20), LEFT_MODE);
   }
 
   /* Initialize SDRAM buffers */
@@ -497,7 +543,7 @@ void filter (int ftype)
         arm_fir_fast_q15(&FIRstructINT2, (q15_t *)AUDIO_BUFFER_OUT, (q15_t *)AUDIO_BUFFER_IN, SIGNAL_SAMPLES);
         arm_fir_fast_q15(&FIRstructINT3, (q15_t *)AUDIO_BUFFER_IN, (q15_t *)AUDIO_BUFFER_OUT, SIGNAL_SAMPLES);
         }
-    else if (ftype==2){
+    else if (ftype==2 || ftype==3){
     	// DSP IIR
     	arm_q15_to_float (AUDIO_BUFFER_IN, float_buffer_in, SIGNAL_SAMPLES);
     	arm_biquad_cascade_df2T_f32(&S, float_buffer_in, float_buffer_out, SIGNAL_SAMPLES);
@@ -521,7 +567,7 @@ void filter (int ftype)
         arm_fir_fast_q15(&FIRstructINT2, (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
         arm_fir_fast_q15(&FIRstructINT3, (q15_t *)(AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), (q15_t *)(AUDIO_BUFFER_OUT + (AUDIO_BLOCK_SIZE)), SIGNAL_SAMPLES);
     }
-    else if (ftype==2){
+    else if (ftype==2 || ftype==3){
     	// DSP IIR
     	arm_q15_to_float((AUDIO_BUFFER_IN + (AUDIO_BLOCK_SIZE)), float_buffer_in2, SIGNAL_SAMPLES);
     	arm_biquad_cascade_df2T_f32(&S, float_buffer_in2, float_buffer_out2, SIGNAL_SAMPLES);

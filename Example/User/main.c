@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    BSP/Src/main.c
-  * @modified by SQ5MJW 01-April-2017
+  * @modified by SQ5MJW 15-April-2017 v0.6
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    30-December-2016 
@@ -50,7 +50,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-/* ftype: 0 = no filter, 1 = DSP BandPass, 2 = DSP BandPass IIR */
+/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, */
 int ftype = 2;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -111,7 +111,6 @@ int main(void)
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FRAME_BUFFER);
   Display_DemoDescription();
 
-  /* ftype: 0 = no filter, 1 = DSP BandPass FIR, 2 = DSP BandPass IIR */
   while (1)
   {
 	filter(ftype);
