@@ -66,18 +66,22 @@ typedef enum
 #define SIGNAL_SAMPLES		AUDIO_BLOCK_SIZE/2
 #define AUDIO_BUFFER_IN    AUDIO_REC_START_ADDR     /* In SDRAM */
 #define AUDIO_BUFFER_OUT   (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 2)) /* In SDRAM */
+
+#define float_buffer_in    (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 4))
+#define float_buffer_out   (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 6))
+#define float_buffer_in2    (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 8))
+#define float_buffer_out2   (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 10))
+
 #define NUM_TAPS_FIR			((uint16_t)232)
-
 #define numStages_IIR 2
-
 #define NUM_TAPS_IIR 5*numStages_IIR
 
 #define BUFSIZE 9
 
-float32_t float_buffer_in [AUDIO_BLOCK_SIZE];
-float32_t float_buffer_out [AUDIO_BLOCK_SIZE];
-float32_t float_buffer_in2 [AUDIO_BLOCK_SIZE];
-float32_t float_buffer_out2 [AUDIO_BLOCK_SIZE];
+//float32_t float_buffer_in [AUDIO_BLOCK_SIZE];
+//float32_t float_buffer_out [AUDIO_BLOCK_SIZE];
+//float32_t float_buffer_in2 [AUDIO_BLOCK_SIZE];
+//float32_t float_buffer_out2 [AUDIO_BLOCK_SIZE];
 
 float32_t pStateIIR[2*numStages_IIR];
 

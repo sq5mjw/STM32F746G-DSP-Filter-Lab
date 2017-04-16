@@ -132,7 +132,6 @@ FIRstructINT4       0xc               Example/User/filter.o
 sdramHandle         0x34              Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery_sdram.o
 LCD_CacheBuffer_yptr_top_bak
                     0x2               Utilities/lcd_log.o
-float_buffer_out    0x80              Example/User/filter.o
 FIRstructINT2       0xc               Example/User/filter.o
 errno               0x4               /home/r2d2/DSP/SystemWorkbench/plugins/fr.ac6.mcu.externaltools.arm-none.linux64_1.13.1.201703061524/tools/compiler/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7e-m/fpu/fpv5-sp-d16/libc_nano.a(lib_a-reent.o)
 pStateIIR           0x10              Example/User/filter.o
@@ -149,7 +148,6 @@ LCD_CacheBuffer_xptr
 S                   0xc               Example/User/filter.o
 haudio_tim          0x40              Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery_audio.o
 pFIRStateINT5       0x20e             Example/User/filter.o
-float_buffer_in     0x80              Example/User/filter.o
 LCD_CacheBuffer_yptr_invert
                     0x1               Utilities/lcd_log.o
 uSdHandle           0x84              Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery_sd.o
@@ -162,7 +160,6 @@ LCD_Scrolled        0x1               Utilities/lcd_log.o
 logmsgbuff          0x80              Example/User/filter.o
 LCD_CacheBuffer_yptr_top
                     0x2               Utilities/lcd_log.o
-float_buffer_out2   0x80              Example/User/filter.o
 hDcmiHandler        0x50              Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery_camera.o
 LCD_ScrollActive    0x1               Utilities/lcd_log.o
 LCD_CacheBuffer     0x3c54            Utilities/lcd_log.o
@@ -172,7 +169,6 @@ pFIRStateINT        0x20e             Example/User/filter.o
 buf                 0x9               Example/User/filter.o
 pFIRStateINT4       0x20e             Example/User/filter.o
 camera_drv          0x4               Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery_camera.o
-float_buffer_in2    0x80              Example/User/filter.o
 LCD_LineColor       0x4               Utilities/lcd_log.o
 audio_rec_buffer_state
                     0x4               Example/User/audio_rec.o
@@ -29720,7 +29716,7 @@ LOAD /home/r2d2/DSP/SystemWorkbench/plugins/fr.ac6.mcu.externaltools.arm-none.li
  .igot.plt      0x200004f8        0x0 /home/r2d2/DSP/SystemWorkbench/plugins/fr.ac6.mcu.externaltools.arm-none.linux64_1.13.1.201703061524/tools/compiler/bin/../lib/gcc/arm-none-eabi/5.4.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
                 0x200004f8                . = ALIGN (0x4)
 
-.bss            0x200004f8     0x1374 load address 0x08007d18
+.bss            0x200004f8     0x1174 load address 0x08007d18
                 0x200004f8                _sbss = .
                 0x200004f8                __bss_start__ = _sbss
  *(.bss)
@@ -29749,40 +29745,36 @@ LOAD /home/r2d2/DSP/SystemWorkbench/plugins/fr.ac6.mcu.externaltools.arm-none.li
                 0x20000b38                uwTick
  COMMON         0x20000b3c        0x4 Example/User/audio_rec.o
                 0x20000b3c                audio_rec_buffer_state
- COMMON         0x20000b40      0xd2c Example/User/filter.o
+ COMMON         0x20000b40      0xb2c Example/User/filter.o
                 0x20000b40                FIRstructINT4
-                0x20000b4c                float_buffer_out
-                0x20000bcc                FIRstructINT2
-                0x20000bd8                pStateIIR
-                0x20000be8                FIRstructINT5
-                0x20000bf4                pFIRStateINT3
-                0x20000e04                S
-                0x20000e10                pFIRStateINT5
-                0x20001020                float_buffer_in
-                0x200010a0                FIRstructINT
-                0x200010ac                logmsgbuff
-                0x2000112c                float_buffer_out2
-                0x200011ac                FIRstructINT3
-                0x200011b8                pFIRStateINT2
-                0x200013c6                pFIRStateINT
-                0x200015d4                buf
-                0x200015de                pFIRStateINT4
-                0x200017ec                float_buffer_in2
-                0x2000186c                . = ALIGN (0x4)
-                0x2000186c                _ebss = .
-                0x2000186c                __bss_end__ = _ebss
+                0x20000b4c                FIRstructINT2
+                0x20000b58                pStateIIR
+                0x20000b68                FIRstructINT5
+                0x20000b74                pFIRStateINT3
+                0x20000d84                S
+                0x20000d90                pFIRStateINT5
+                0x20000fa0                FIRstructINT
+                0x20000fac                logmsgbuff
+                0x2000102c                FIRstructINT3
+                0x20001038                pFIRStateINT2
+                0x20001246                pFIRStateINT
+                0x20001454                buf
+                0x2000145e                pFIRStateINT4
+                0x2000166c                . = ALIGN (0x4)
+                0x2000166c                _ebss = .
+                0x2000166c                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x2000186c      0x604 load address 0x08007d18
-                0x20001870                . = ALIGN (0x8)
- *fill*         0x2000186c        0x4 
-                0x20001870                PROVIDE (end, .)
+                0x2000166c      0x604 load address 0x08007d18
+                0x20001670                . = ALIGN (0x8)
+ *fill*         0x2000166c        0x4 
+                0x20001670                PROVIDE (end, .)
                 [!provide]                PROVIDE (_end, .)
-                0x20001a70                . = (. + _Min_Heap_Size)
- *fill*         0x20001870      0x200 
-                0x20001e70                . = (. + _Min_Stack_Size)
- *fill*         0x20001a70      0x400 
-                0x20001e70                . = ALIGN (0x8)
+                0x20001870                . = (. + _Min_Heap_Size)
+ *fill*         0x20001670      0x200 
+                0x20001c70                . = (. + _Min_Stack_Size)
+ *fill*         0x20001870      0x400 
+                0x20001c70                . = ALIGN (0x8)
 
 /DISCARD/
  libc.a(*)
@@ -29876,7 +29868,7 @@ LOAD /home/r2d2/DSP/SystemWorkbench/plugins/fr.ac6.mcu.externaltools.arm-none.li
                 0x0000089b       0x22 /home/r2d2/DSP/SystemWorkbench/plugins/fr.ac6.mcu.externaltools.arm-none.linux64_1.13.1.201703061524/tools/compiler/bin/../lib/gcc/arm-none-eabi/5.4.1/armv7e-m/fpu/fpv5-sp-d16/crtn.o
 OUTPUT(cwfilter_sq5mjw.elf elf32-littlearm)
 
-.debug_info     0x00000000    0x1f3cf
+.debug_info     0x00000000    0x1f383
  .debug_info    0x00000000     0x3612 Drivers/BSP/Components/wm8994.o
  .debug_info    0x00003612     0x1f95 Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery.o
  .debug_info    0x000055a7     0x2472 Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery_audio.o
@@ -29905,11 +29897,11 @@ OUTPUT(cwfilter_sq5mjw.elf elf32-littlearm)
  .debug_info    0x0001ab16       0x79 Example/SW4STM32/startup_stm32f746xx.o
  .debug_info    0x0001ab8f      0x7e4 Example/User/audio_rec.o
  .debug_info    0x0001b373     0x1512 Example/User/camera.o
- .debug_info    0x0001c885     0x10be Example/User/filter.o
- .debug_info    0x0001d943      0xe1a Example/User/main.o
- .debug_info    0x0001e75d      0xa3c Example/User/stm32f7xx_it.o
- .debug_info    0x0001f199      0x11b Utilities/Fonts/font12.o
- .debug_info    0x0001f2b4      0x11b Utilities/Fonts/font24.o
+ .debug_info    0x0001c885     0x1072 Example/User/filter.o
+ .debug_info    0x0001d8f7      0xe1a Example/User/main.o
+ .debug_info    0x0001e711      0xa3c Example/User/stm32f7xx_it.o
+ .debug_info    0x0001f14d      0x11b Utilities/Fonts/font12.o
+ .debug_info    0x0001f268      0x11b Utilities/Fonts/font24.o
 
 .debug_abbrev   0x00000000     0x43fc
  .debug_abbrev  0x00000000      0x29a Drivers/BSP/Components/wm8994.o
@@ -30077,7 +30069,7 @@ OUTPUT(cwfilter_sq5mjw.elf elf32-littlearm)
  .debug_ranges  0x00001c48       0x78 Example/User/main.o
  .debug_ranges  0x00001cc0       0x80 Example/User/stm32f7xx_it.o
 
-.debug_macro    0x00000000    0x2b1cf
+.debug_macro    0x00000000    0x2b1e7
  .debug_macro   0x00000000       0x81 Drivers/BSP/Components/wm8994.o
  .debug_macro   0x00000081       0x10 Drivers/BSP/Components/wm8994.o
  .debug_macro   0x00000091       0xbe Drivers/BSP/Components/wm8994.o
@@ -30193,11 +30185,11 @@ OUTPUT(cwfilter_sq5mjw.elf elf32-littlearm)
  .debug_macro   0x00029d50       0x16 Example/User/audio_rec.o
  .debug_macro   0x00029d66       0x60 Example/User/audio_rec.o
  .debug_macro   0x00029dc6      0x4dc Example/User/camera.o
- .debug_macro   0x0002a2a2      0x535 Example/User/filter.o
- .debug_macro   0x0002a7d7      0x482 Example/User/main.o
- .debug_macro   0x0002ac59      0x490 Example/User/stm32f7xx_it.o
- .debug_macro   0x0002b0e9       0x73 Utilities/Fonts/font12.o
- .debug_macro   0x0002b15c       0x73 Utilities/Fonts/font24.o
+ .debug_macro   0x0002a2a2      0x54d Example/User/filter.o
+ .debug_macro   0x0002a7ef      0x482 Example/User/main.o
+ .debug_macro   0x0002ac71      0x490 Example/User/stm32f7xx_it.o
+ .debug_macro   0x0002b101       0x73 Utilities/Fonts/font12.o
+ .debug_macro   0x0002b174       0x73 Utilities/Fonts/font24.o
 
 .debug_line     0x00000000    0x17377
  .debug_line    0x00000000      0x5dd Drivers/BSP/Components/wm8994.o
@@ -30234,7 +30226,7 @@ OUTPUT(cwfilter_sq5mjw.elf elf32-littlearm)
  .debug_line    0x00016d93      0x2f2 Utilities/Fonts/font12.o
  .debug_line    0x00017085      0x2f2 Utilities/Fonts/font24.o
 
-.debug_str      0x00000000    0xff9c4
+.debug_str      0x00000000    0xffa85
  .debug_str     0x00000000     0x3932 Drivers/BSP/Components/wm8994.o
                                0x3b28 (size before relaxing)
  .debug_str     0x00003932    0xf09d2 Drivers/BSP/STM32746G_DISCOVERY/stm32746g_discovery.o
@@ -30289,15 +30281,15 @@ OUTPUT(cwfilter_sq5mjw.elf elf32-littlearm)
                               0xf7cb4 (size before relaxing)
  .debug_str     0x000fee17      0x630 Example/User/camera.o
                               0xf8a85 (size before relaxing)
- .debug_str     0x000ff447      0x39d Example/User/filter.o
-                              0xf8dfd (size before relaxing)
- .debug_str     0x000ff7e4       0xd4 Example/User/main.o
+ .debug_str     0x000ff447      0x45e Example/User/filter.o
+                              0xf8ebe (size before relaxing)
+ .debug_str     0x000ff8a5       0xd4 Example/User/main.o
                               0xf7fe1 (size before relaxing)
- .debug_str     0x000ff8b8       0xba Example/User/stm32f7xx_it.o
+ .debug_str     0x000ff979       0xba Example/User/stm32f7xx_it.o
                               0xf80a4 (size before relaxing)
- .debug_str     0x000ff972       0x29 Utilities/Fonts/font12.o
+ .debug_str     0x000ffa33       0x29 Utilities/Fonts/font12.o
                                0x34a5 (size before relaxing)
- .debug_str     0x000ff99b       0x29 Utilities/Fonts/font24.o
+ .debug_str     0x000ffa5c       0x29 Utilities/Fonts/font24.o
                                0x34a5 (size before relaxing)
 
 .comment        0x00000000       0x6e
