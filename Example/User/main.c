@@ -50,9 +50,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, 4 = DSP IIR Chebyshev, 5 = Gauss*/
+/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, 4 = DSP IIR Chebyshev, 5 = Butterworth, 6 = Gauss, 7 = Gauss narrow*/
 int findex = 0;
-int fnumber = 6;
+int fnumber = 8;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
