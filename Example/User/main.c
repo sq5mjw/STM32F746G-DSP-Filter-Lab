@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    BSP/Src/main.c
-  * @modified by SQ5MJW 15-April-2017 v0.6
+  * @modified by SQ5MJW 16-April-2017 v0.61
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    30-December-2016 
@@ -50,9 +50,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, 4 = DSP IIR Chebyshev,*/
+/* ftype: 0 = no filter, 1 = DSP FIR, 2 = DSP IIR Papoulis, 3 = DSP IIR Bessel, 4 = DSP IIR Chebyshev, 5 = Gauss*/
 int findex = 0;
-int fnumber = 5;
+int fnumber = 6;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
@@ -115,6 +115,7 @@ int main(void)
   while (1)
   {
       HAL_Delay(10);
+      //BSP_AUDIO_IN_SetVolume(90);
       filter(findex % fnumber);
 	    if (BSP_PB_GetState(BUTTON_KEY) != RESET)
 	    {
