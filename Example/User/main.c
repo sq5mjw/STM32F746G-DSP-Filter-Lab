@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    BSP/Src/main.c
-  * @modified by SQ5MJW 16-April-2017 v0.61
+  * @modified by SQ5MJW 16-April-2017 v0.62
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    30-December-2016 
