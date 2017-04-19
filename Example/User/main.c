@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    BSP/Src/main.c
-  * @modified by SQ5MJW 16-April-2017 v0.62
+  * @modified by SQ5MJW 16-April-2017 v0.7
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    30-December-2016 
@@ -68,6 +68,9 @@ static void SystemClock_Config(void);
 static void Display_DemoDescription(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
+static TS_StateTypeDef  TS_State;
+
+uint8_t  status = 0;
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -111,20 +114,14 @@ int main(void)
   /* Initialize the LCD Layers */
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FRAME_BUFFER);
   Display_DemoDescription();
+  status = BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
 
   while (1)
   {
-      HAL_Delay(10);
-      //BSP_AUDIO_IN_SetVolume(90);
-      filter(findex % fnumber);
-	    if (BSP_PB_GetState(BUTTON_KEY) != RESET)
-	    {
-	      HAL_Delay(10);
-	      while (BSP_PB_GetState(BUTTON_KEY) != RESET);
-	      findex++;
-	    }
-	      Display_DemoDescription();
-
+//      HAL_Delay(10);
+	  filter(findex % fnumber);
+	  findex++;
+      Display_DemoDescription();
   }
 }
 
@@ -216,6 +213,17 @@ uint8_t CheckForUserInput(void)
   }
   return 0;
 }
+
+uint8_t CheckForUserInputTP(void)
+{
+  BSP_TS_GetState(&TS_State);
+  if ((TS_State.touchDetected) || (BSP_PB_GetState(BUTTON_KEY) != RESET))
+  {
+    return 1;
+  }
+  return 0;
+}
+
 
 /**
   * @brief EXTI line detection callbacks.

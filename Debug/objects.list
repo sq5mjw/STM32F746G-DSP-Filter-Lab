@@ -322,6 +322,7 @@
 "Example/User/sdram.o"
 "Example/User/sdram_dma.o"
 "Example/User/stm32f7xx_it.o"
+"Example/User/touchscreen.o"
 "Utilities/Fonts/font12.o"
 "Utilities/Fonts/font16.o"
 "Utilities/Fonts/font20.o"

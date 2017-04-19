@@ -12,7 +12,8 @@ C_SRCS += \
 ../Example/User/main.c \
 ../Example/User/sdram.c \
 ../Example/User/sdram_dma.c \
-../Example/User/stm32f7xx_it.c 
+../Example/User/stm32f7xx_it.c \
+../Example/User/touchscreen.c 
 
 OBJS += \
 ./Example/User/audio_rec.o \
@@ -23,7 +24,8 @@ OBJS += \
 ./Example/User/main.o \
 ./Example/User/sdram.o \
 ./Example/User/sdram_dma.o \
-./Example/User/stm32f7xx_it.o 
+./Example/User/stm32f7xx_it.o \
+./Example/User/touchscreen.o 
 
 C_DEPS += \
 ./Example/User/audio_rec.d \
@@ -34,7 +36,8 @@ C_DEPS += \
 ./Example/User/main.d \
 ./Example/User/sdram.d \
 ./Example/User/sdram_dma.d \
-./Example/User/stm32f7xx_it.d 
+./Example/User/stm32f7xx_it.d \
+./Example/User/touchscreen.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

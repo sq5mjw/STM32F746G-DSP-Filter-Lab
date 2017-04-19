@@ -133,7 +133,7 @@ extern uint32_t    ErrorCounter;
 void AudioPlay_demo (void);
 void AudioRec_demo (void);
 void AudioLoopback_demo (void);
-void Touchscreen_demo (void);
+int Touchscreen_demo (void);
 void LCD_demo (void);
 void Log_demo(void);
 void SDRAM_demo(void);
