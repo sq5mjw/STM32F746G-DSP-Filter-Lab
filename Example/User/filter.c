@@ -77,7 +77,9 @@ typedef enum
 
 #define BUFSIZE 9
 
-float32_t pStateIIR[2*numStages_IIR];
+float32_t pStateIIR [2*numStages_IIR];
+
+
 
 arm_biquad_cascade_df2T_instance_f32 S;
 
@@ -762,7 +764,6 @@ void filter (int ftype)
 	  arm_fir_init_q15(&FIRstructINT4, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT4, SIGNAL_SAMPLES);
 	  arm_fir_init_q15(&FIRstructINT5, NUM_TAPS_FIR, firCoeffINT_BP, pFIRStateINT5, SIGNAL_SAMPLES);
 
-
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"FIR filtering is ON, BandPass x5", LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_FIR,10), LEFT_MODE);
@@ -771,7 +772,7 @@ void filter (int ftype)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Papoulis, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Papoulis BW 150Hz", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR type: Papoulis BW 150Hz", LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,10), LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,10), LEFT_MODE);
 
@@ -781,7 +782,7 @@ void filter (int ftype)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Bessel, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Bessel BW 150Hz", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR type: Bessel BW 150Hz", LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,10), LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,10), LEFT_MODE);
   }
@@ -790,7 +791,7 @@ void filter (int ftype)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Chebyshev, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Chebyshev BW 150Hz", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR type: Chebyshev BW 150Hz", LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,10), LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,10), LEFT_MODE);
   }
@@ -799,7 +800,7 @@ void filter (int ftype)
    {
  	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Butterworth, pStateIIR);
  	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
- 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Butterworth BW 150Hz", LEFT_MODE);
+ 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR type: Butterworth BW 150Hz", LEFT_MODE);
  	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,10), LEFT_MODE);
  	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,10), LEFT_MODE);
    }
@@ -809,7 +810,7 @@ void filter (int ftype)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Gauss, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Gauss BW 150Hz", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR type: Gauss BW 150Hz", LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,10), LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,10), LEFT_MODE);
   }
@@ -818,7 +819,7 @@ void filter (int ftype)
   {
 	  arm_biquad_cascade_df2T_init_f32(&S, numStages_IIR, pCoeffs_Gauss_narrow, pStateIIR);
 	  BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR filtering is ON, type: Gauss BW 100Hz", LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 205, (uint8_t *)"IIR type: Gauss BW 100Hz", LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 195, (uint8_t *)logmsg("Order ",2*numStages_IIR,10), LEFT_MODE);
 	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 185, (uint8_t *)logmsg("Coeff taps ",NUM_TAPS_IIR,10), LEFT_MODE);
   }
@@ -912,10 +913,27 @@ static void AudioLoopback_SetHint(void)
   BSP_LCD_SetTextColor(LCD_COLOR_RED);
   BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
   BSP_LCD_SetFont(&Font20);
-  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW Filter Lab v0.7       700Hz", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW Filter v0.8           700Hz", LEFT_MODE);
   BSP_LCD_SetFont(&Font12);
   BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-  BSP_LCD_DisplayStringAt(0, 22, (uint8_t *)"Use the touch screen or the user button to switch to the next filter", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, 22, (uint8_t *)"Use the touch screen to select the filter", LEFT_MODE);
+  BSP_LCD_SetTextColor(LCD_COLOR_CYAN);
+  BSP_LCD_FillCircle(320, 20, 10);
+  BSP_LCD_DisplayStringAt(340, 15, (uint8_t *)"OFF", LEFT_MODE); //x 300-350 y 10-30
+  BSP_LCD_FillCircle(320, 50, 10);
+  BSP_LCD_DisplayStringAt(340, 45, (uint8_t *)"FIR x5", LEFT_MODE); //x 300-350 y40-60
+  BSP_LCD_FillCircle(320, 80, 10);
+  BSP_LCD_DisplayStringAt(340, 75, (uint8_t *)"Papoulis 150Hz", LEFT_MODE);
+  BSP_LCD_FillCircle(320, 110, 10);
+  BSP_LCD_DisplayStringAt(340, 105, (uint8_t *)"Bessel 150Hz", LEFT_MODE);
+  BSP_LCD_FillCircle(320, 140, 10);
+  BSP_LCD_DisplayStringAt(340, 135, (uint8_t *)"Chebyshev 150Hz", LEFT_MODE);
+  BSP_LCD_FillCircle(320, 170, 10);
+  BSP_LCD_DisplayStringAt(340, 165, (uint8_t *)"Butterworth 150Hz", LEFT_MODE);
+  BSP_LCD_FillCircle(320, 200, 10);
+  BSP_LCD_DisplayStringAt(340, 195, (uint8_t *)"Gauss 150Hz", LEFT_MODE);
+  BSP_LCD_FillCircle(320, 230, 10);
+  BSP_LCD_DisplayStringAt(340, 225, (uint8_t *)"Gauss 100Hz", LEFT_MODE);
 }
 
 

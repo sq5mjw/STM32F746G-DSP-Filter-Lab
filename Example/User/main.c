@@ -68,6 +68,7 @@ static void SystemClock_Config(void);
 static void Display_DemoDescription(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
+void filter(int);
 static TS_StateTypeDef  TS_State;
 
 uint8_t  status = 0;
@@ -113,16 +114,38 @@ int main(void)
   ASSERT(lcd_status != LCD_OK);
   /* Initialize the LCD Layers */
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FRAME_BUFFER);
-  Display_DemoDescription();
   status = BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-
+  Display_DemoDescription();
   while (1)
   {
-//      HAL_Delay(10);
-	  filter(findex % fnumber);
-	  findex++;
+	  filter(findex);
+	  findex=pointouched(TS_State.touchX[0],TS_State.touchY[0]);
       Display_DemoDescription();
   }
+}
+
+int pointouched(int x, int y){
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 175, (uint8_t *)logmsg("x = ",x,10), LEFT_MODE);
+	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 165, (uint8_t *)logmsg("y = ",y,10), LEFT_MODE);
+	  if (x>=300 & x<=350 & y>=10 & y<=30){
+		  return 0;
+	  } else if (x>=300 & x<=350 & y>=40 & y<=60){
+		  return 1;
+	  } else if (x>=300 & x<=350 & y>=70 & y<=90){
+		  return 2;
+	  } else if (x>=300 & x<=350 & y>=100 & y<=120){
+		  return 3;
+	  } else if (x>=300 & x<=350 & y>130 & y<=150){
+		  return 4;
+	  }  else if (x>=300 & x<=350 & y>=160 & y<180){
+		  return 5;
+	  }  else if (x>=300 & x<=350 & y>=190 & y<220){
+		  return 6;
+	  }  else if (x>=300 & x<=350 & y>=220 & y<=230){
+		  return 7;
+	  }  else if (x>=300 & x<=350 & y>=250 & y<=260){
+		  return 8;
+	  }
 }
 
 /**
