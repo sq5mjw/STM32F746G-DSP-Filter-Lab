@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    BSP/Src/main.c
-  * @modified by SQ5MJW 16-April-2017 v0.7
+  * @modified by SQ5MJW 23-April-2017 v0.82
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    30-December-2016 
@@ -69,6 +69,7 @@ static void Display_DemoDescription(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 void filter(int);
+void filterinit(void);
 static TS_StateTypeDef  TS_State;
 
 uint8_t  status = 0;
@@ -116,6 +117,7 @@ int main(void)
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FRAME_BUFFER);
   status = BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
   Display_DemoDescription();
+  filterinit();
   while (1)
   {
 	  filter(findex);
@@ -125,26 +127,30 @@ int main(void)
 }
 
 int pointouched(int x, int y){
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 175, (uint8_t *)logmsg("x = ",x,10), LEFT_MODE);
-	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 165, (uint8_t *)logmsg("y = ",y,10), LEFT_MODE);
-	  if (x>=300 & x<=350 & y>=10 & y<=30){
+//	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 175, (uint8_t *)logmsg("x = ",x,10), LEFT_MODE);
+//	  BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 165, (uint8_t *)logmsg("y = ",y,10), LEFT_MODE);
+//   	memcpy((uint16_t *)(AUDIO_BUFFER_OUT),(uint16_t *)(AUDIO_BUFFER_IN),AUDIO_BLOCK_SIZE);
+   	int tmp=findex;
+	  if (x>=300 & x<=370 & y>=10 & y<=30){
 		  return 0;
-	  } else if (x>=300 & x<=350 & y>=40 & y<=60){
+	  } else if (x>=300 & x<=370 & y>=40 & y<=60){
 		  return 1;
-	  } else if (x>=300 & x<=350 & y>=70 & y<=90){
+	  } else if (x>=300 & x<=370 & y>=70 & y<=90){
 		  return 2;
-	  } else if (x>=300 & x<=350 & y>=100 & y<=120){
+	  } else if (x>=300 & x<=370 & y>=100 & y<=120){
 		  return 3;
-	  } else if (x>=300 & x<=350 & y>130 & y<=150){
+	  } else if (x>=300 & x<=370 & y>130 & y<=150){
 		  return 4;
-	  }  else if (x>=300 & x<=350 & y>=160 & y<180){
+	  }  else if (x>=300 & x<=370 & y>=160 & y<180){
 		  return 5;
-	  }  else if (x>=300 & x<=350 & y>=190 & y<220){
+	  }  else if (x>=300 & x<=370 & y>=190 & y<220){
 		  return 6;
-	  }  else if (x>=300 & x<=350 & y>=220 & y<=230){
+	  }  else if (x>=300 & x<=370 & y>=220 & y<=230){
 		  return 7;
-	  }  else if (x>=300 & x<=350 & y>=250 & y<=260){
+	  }  else if (x>=300 & x<=370 & y>=250 & y<=260){
 		  return 8;
+	  } else {
+		  return findex;
 	  }
 }
 
