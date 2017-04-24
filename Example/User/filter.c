@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  *  * @modified by SQ5MJW 23-April-2017 v0.82
+  *  * @modified by SQ5MJW 23-April-2017 v0.83
   * @file    BSP/Src/filter.c
   * @original author  MCD Application Team
   * @version 0.5
@@ -934,7 +934,7 @@ static void AudioLoopback_SetHint(void)
   BSP_LCD_SetTextColor(LCD_COLOR_RED);
   BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
   BSP_LCD_SetFont(&Font20);
-  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW Filter v0.82           700Hz", LEFT_MODE);
+  BSP_LCD_DisplayStringAt(0, 0, (uint8_t *)"SQ5MJW Filter v0.83          700Hz", LEFT_MODE);
   BSP_LCD_SetFont(&Font12);
   BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
   BSP_LCD_DisplayStringAt(0, 22, (uint8_t *)"Use the touch screen to select the filter", LEFT_MODE);

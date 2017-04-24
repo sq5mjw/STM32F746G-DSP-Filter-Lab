@@ -592,7 +592,11 @@ uint32_t wm8994_Init(uint16_t DeviceAddr, uint16_t OutputInputDevice, uint8_t Vo
       counter += CODEC_IO_Write(DeviceAddr, 0x1A, 0x000B);
 
       /* AIF ADC1 HPF enable, HPF cut = hifi mode fc=4Hz at fs=48kHz */
-      counter += CODEC_IO_Write(DeviceAddr, 0x410, 0x1800);
+      // WM8994_v4.5.pdf page.95 & p.300
+      // 0x1800 = 0001100000000000 - HiFi
+      // 0x7800 = 0111100000000000 - Voice mode 3
+      //counter += CODEC_IO_Write(DeviceAddr, 0x410, 0x1800); //<-- default
+      counter += CODEC_IO_Write(DeviceAddr, 0x410, 0x7800);
     }
     /* Volume Control */
     wm8994_SetVolume(DeviceAddr, Volume);
